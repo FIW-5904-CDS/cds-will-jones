@@ -1,0 +1,138 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+library(sf)
+library(terra)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(tidyr)
+library(nngeo)
+library(leaflet)
+library(leaflegend)
+library(tigris)
+library(landscapemetrics)
+library(ggthemes)
+setwd(r"{E:\01_PROJECTS\01_Roads}")
+```
+
+```{r}
+#setwd('04_seed98')
+pairwise_2k <- st_read('snapped_00_distribution.shp')
+
+distances_2k <- pairwise_2k %>% rename('dist_00' = 'dst_t_r', 
+                                       'rdcls_00' = 'rd_clss', 
+                                       'dst_rnd00' = 'dst_rnd') %>%
+                                mutate(lon = round(lon), lat = round(lat))
+
+
+pairwise_24 <- st_read('tigerline_24_pairwise.shp') %>% st_transform(crs = "EPSG:5070")
+
+distances_24 <- pairwise_24 %>% select(-ecoregn,-eco_cod) %>% 
+  rename('dist_24' = 'dst_t_r',
+         'rdcls_24' = 'rd_code',
+          'dst_rnd24' = 'dst_rnd') %>%
+  dplyr::mutate(lon = round(sf::st_coordinates(.)[,1]),
+                lat = round(sf::st_coordinates(.)[,2]))
+
+to_keep <- c('rdcls_24', 'dist_24', 'lon','lat','dst_rnd24')
+distances_24 <- distances_24 %>% select(all_of(to_keep)) %>% st_drop_geometry()
+
+all_data <- inner_join(distances_2k, distances_24, by = c("lon", "lat"), suffix = c("_2k", "_24"))
+
+all_data <- inner_join(all_data, distances_2k_no_snap, by = c('lon', 'lat')) %>% select(-geometry.x) %>% select(-geometry.y)
+
+```
+
+```{r}
+hu8s_full <- st_read("02_vectors\\Shape\\WBDHU8.shp")
+hu8s <- hu8s_full %>% select(c('name', 'huc8'))
+eco_l4 <- st_read("02_vectors\\us_eco_l4.shp")
+eco_l4_filter <- eco_l4 %>% select(c("US_L4CODE", "US_L4NAME", "US_L3NAME", "US_L3CODE")) %>% st_transform(crs = 'EPSG:5070')
+plot(st_geometry(eco_l4 %>% filter(STATE_NAME == "Virginia")))
+```
+
+```{r}
+va_nlcd <- rast("va_nlcd_2023.tif")
+us_states <- st_read("us_state_boundaries\\USA_State.shp") %>% st_transform(crs='EPSG:5070')
+va_and_surrounding <- us_states %>% filter(STATE_ABBR %in% c("VA", "DC", "TN", "KY", "WV", "NC", "MD"))
+```
+
+```{r}
+roads_TEST <- st_read(r"{E:\01_PROJECTS\01_Roads\02_vectors\02_tiger2k\snapped_2k.shp}")
+roads_TEST <- roads_TEST %>% select(CFCC)
+```
+
+```{r}
+set.seed(98)
+random_points <- st_sample(va_and_surrounding[6,], size = 1e6, type = "random")
+print(crs(random_points))
+```
+
+```{r}
+
+all_data <- st_read('pairwise_data_07_28.gpkg') 
+all_data <- vect(all_data)
+```
+
+```{r}
+e <- ext(1090097, 1789211, 1577005, 1966235)
+r <- rast(extent = e, resolution = 1000)
+crs(r) <- "EPSG:5070"
+
+rast_00 <- rasterize(all_data, r, field = 'dist_00', 'mean')
+rast_24 <- rasterize(all_data, r, field = 'dist_24', 'mean')
+```
+
+```{r}
+rast_75_00 <- rast_00 >= 3.247427e+02
+rast_75_24 <- rast_24 >= 3.247427e+02
+
+para_00 <- rast_75_00 %>% lsm_p_para() %>% filter(class == 1) %>% as.data.frame() %>% select(value)
+para_00$group = as.factor(2000)
+
+para_24 <- rast_75_24 %>% lsm_p_para() %>% filter(class == 1) %>% as.data.frame() %>%
+select(value)
+para_24$group = as.factor(2024)
+
+long_data <- rbind(para_00, para_24)
+```
+
+```{r}
+
+para_00_plot <- para_00 %>% ggplot(aes(x= value)) +
+geom_density(bins=100)
+
+para_24_plot <- para_24 %>% ggplot(aes(x=value)) +
+geom_density()
+
+
+para_00_plot
+para_24_plot
+
+plot(rast_75_00)
+plot(rast_75_24)
+```
+
+```{r}
+
+
+both_plots <- long_data %>% ggplot(aes(x=value, color = group)) +
+geom_density(position = "identity", alpha = 0.5) +
+scale_color_manual( values = c('2000' = 'red', '2024' = 'purple')) +
+labs(title = 'Perimeter-Area Ratio of Patches in 3rd Quartile (Dist. from Roads)',
+     color = "Year") +
+xlab('Perimeter-Area Ratio') +
+ylab('')+
+theme_fivethirtyeight() +
+theme(axis.title.x = element_text())
+
+both_plots
+
+
+long_data %>% ggplot(aes(x=group, y=value))+
+geom_boxplot()
+```

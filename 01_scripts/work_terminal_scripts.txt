@@ -1,0 +1,24 @@
+06/27/2025 start: 11:30 am
+-using GDAL ogr2ogr command line to get RT1 files (TIGER) to shapefile
+-pain in my ass
+-using USGS NTD dataset instead of most recent base tiger/line roads files
+-think they should be similar enough
+
+
+cd /Volumes/MyPassport/01_PROJECTS/01_Roads/01_scripts/tiger2k
+
+VA
+
+for file in *.RT1; do base=$(basename "$file" .RT1); ogr2ogr -f "ESRI Shapefile" "va2k/${base}.shp" "$file" CompleteChain -where "CFCC LIKE 'A%'"; done
+
+ 
+
+for windows:: 
+
+Get-ChildItem -Filter *.RT1 | ForEach-Object { $base = [System.IO.Path]::GetFileNameWithoutExtension($_.Name); ogr2ogr -f "ESRI Shapefile" "va_rva\$base.shp" $_.FullName CompleteChain -where "CFCC LIKE 'A%'" }
+
+marging the .shp files::
+
+
+
+ogrmerge.py -single *.shp -o merged/all2k_roads.shp

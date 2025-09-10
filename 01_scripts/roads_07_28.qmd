@@ -1,0 +1,387 @@
+---
+title: "Roads Project 07-28-2025"
+author: "Will Jones"
+editor: visual
+format:
+  html:
+    embed-resources: true
+execute: 
+  echo: false
+  warning: false
+  message: false
+  publish:
+  resources:
+  - "*.png"
+  site-url: "https://willj98.quarto.pub/roads-project-07-28"
+---
+
+# Data Visualization for Our Roads Distribution Study
+
+```{r}
+#| warning: false
+#| echo: false
+#| message: false
+library(sf)
+library(terra)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(tidyr)
+library(nngeo)
+library(leaflet)
+library(leaflegend)
+library(tigris)
+library(foreign)
+library(purrr)
+library(tidyverse)
+library(readr)
+library(ggridges)
+library(tmap)
+library(landscapemetrics)
+```
+
+### Read in and tidy our pairwise point data
+
+This table includes the PAIRED distributions of points measured in 2000 and 2024. These distances are measured between each \~1e6 point and the nearest U.S. Census Bureau TIGER/Line road feature.
+
+`all_data <- st_read('pairwise_data_07_28.gpkg')`
+
+`EPSG:5070, NAD 83 CONUS Albers | Unit: m`
+
+```{r}
+#| echo: false
+#| message: false
+#| include: false
+
+# This table is easy to use for calculating summary statistics of each distribution
+setwd("E:\\01_PROJECTS\\01_Roads\\06_fixing_final_files")
+all_data <- st_read('pairwise_data_07_28.gpkg')
+all_data <- all_data %>% mutate(ratio = (dist_24 / dist_00)) %>% mutate(log_ratio = log10(ratio))
+#head(all_data)
+# While we pivot this data to "long" format for easier visualization
+long_data <- all_data %>%
+  pivot_longer(
+    cols = c(dist_00, dist_24, log_ratio),
+    names_to = "measure_type", 
+    values_to = "meters" 
+  )
+```
+
+Columns common to both measurements ('00 and '24) are `lon, lat, nlcd, lulc, county_name, ws_name, ws_code, ecoregion,`and `eco_code.` The columns `rdcls_00` and`rdcls_24` contain the classification of the nearest road in 2000 and 2024, respectively. Columns `dist_00` and `dist_24` contain the distance in meters to the nearest road in each year. The columns `ratio` and `ln_ratio` are `(dist_24/dist_00)`and `ln(dist_24/dist_00)`, respectively.
+
+```{r}
+print(colnames(all_data))
+```
+
+<br>
+
+Summary stats for yr 2000 and yr 2024
+
+```{r}
+#| echo: false
+print('pairwise distribution yr 2000:')
+long_data %>% filter(measure_type == 'dist_00') %>% select(meters) %>% st_drop_geometry() %>% summary()
+print('pairwise distribution yr 2024:')
+long_data %>% filter(measure_type == 'dist_24') %>% select(meters) %>% st_drop_geometry() %>% summary()
+
+```
+
+```{r}
+
+```
+
+```{r fig.height =8, fig.width=10}
+#| fig-cap: 'Distribution of Paired Sample Points'
+
+# Sample jitter data separately
+jitter_sample <- long_data %>%
+  filter(measure_type %in% c('dist_00', 'dist_24')) %>%
+  mutate(measure_type = factor(measure_type, levels = c('dist_00', 'dist_24'))) %>%
+  filter(
+    meters >= quantile(meters, 0.05, na.rm = TRUE),
+    meters <= quantile(meters, 0.95, na.rm = TRUE)
+  ) %>%
+  sample_n(1000)  # Smaller sample just for jitter
+levels(jitter_sample$measure_type) <- c("2000", "2024")
+
+# Full data for boxplot
+box_data <- long_data %>%
+  filter(measure_type %in% c('dist_00', 'dist_24')) %>%
+  mutate(measure_type = factor(measure_type, levels = c('dist_00', 'dist_24'))) %>%
+  filter(
+    meters >= quantile(meters, 0.05, na.rm = TRUE),
+    meters <= quantile(meters, 0.95, na.rm = TRUE)
+  )
+levels(box_data$measure_type) <- c("2000", "2024")
+
+# Create plot
+ggplot(box_data, aes(x = measure_type, y = meters)) +
+  geom_boxplot(outlier.shape = NA) +  # Suppress default outliers if you like
+  geom_jitter(data = jitter_sample, aes(x = measure_type, y = meters), 
+              width = 0.15, alpha = 0.2, color = "steelblue") +
+  theme_minimal() +
+  xlab('Year') +
+  ylab('Distance (meters)')
+
+
+```
+
+```{r}
+
+dbell_data <- long_data %>%
+  group_by(county_name, measure_type) %>%
+  summarise(avg_value = mean(meters), .groups = "drop") %>%
+  pivot_wider(names_from = measure_type, values_from = avg_value)
+```
+
+```{r}
+
+dumbbell <- dbell_data %>%
+  ggplot(aes(y = county_name)) +
+  geom_segment(aes(x = dist_00, xend = dist_24, yend = county_name), color = "black", alpha = 0.7) +
+  geom_point(aes(x = dist_00, y = county_name),
+            col = 'purple', alpha = 0.5) +
+  geom_point(aes(x = dist_24, y = county_name),
+            col = 'orange', alpha = 0.5) +
+  scale_x_reverse() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank())
+
+
+ggplotly(dumbbell)
+```
+
+```{r}
+
+dbell_data <- long_data %>%
+  group_by(ecoregion, measure_type) %>%
+  summarise(avg_value = mean(meters), .groups = "drop") %>%
+  pivot_wider(names_from = measure_type, values_from = avg_value)
+```
+
+```{r}
+
+dumbbell <- dbell_data %>%
+  ggplot(aes(y = ecoregion)) +
+  geom_segment(aes(x = dist_00, xend = dist_24, yend = ecoregion), color = "black", alpha = 0.7,
+              ) +
+  geom_point(aes(x = dist_00, y = ecoregion),
+            col = 'purple', alpha = 0.5) +
+  geom_point(aes(x = dist_24, y = ecoregion),
+            col = 'orange', alpha = 0.5) +
+  theme_minimal()
+
+
+
+ggplotly(dumbbell)
+```
+
+```{r}
+dumbbell <- dbell_data %>%
+  ggplot(aes(y = ecoregion)) +
+  geom_segment(aes(x = dist_00, xend = dist_24, yend = ecoregion), color = "black", alpha = 0.7,
+              arrow = arrow(type='closed')) +
+  geom_point(aes(x = dist_00, y = ecoregion),
+           col = 'purple', alpha = 0.5) +
+  geom_point(aes(x = dist_24, y = ecoregion),
+           col = 'orange', alpha = 0.5) +
+  theme_minimal() +
+theme(axis.text.y = element_blank())
+
+dumbbell
+```
+
+```{r fig.height =8, fig.width=10}
+#| fig-cap: "Distribution of Paired Points"
+pairwise_histogram <- long_data %>%
+  filter(measure_type %in% c('dist_00','dist_24'
+  )) %>%
+  mutate(measure_type = factor(measure_type,
+                          levels = c("dist_00", "dist_24"),
+                          labels = c("2000", "2024"))) %>%
+  ggplot(mapping = aes(x = log(meters), fill = measure_type)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 500) +
+  scale_fill_manual(values = c("2000" = "#009688", "2024" = "#FF7043")) +
+  theme_minimal() +
+  xlab('ln(meters)')
+
+ggplotly(pairwise_histogram)
+
+```
+
+```{r}
+
+log_diff_hist <- long_data %>% filter(measure_type == 'log_ratio') %>% ggplot(aes(x=meters)) +
+geom_histogram(bins = 1000)
+
+ggplotly(log_diff_hist)
+```
+
+```{r}
+eco_ridges <- long_data %>% filter(measure_type == 'dist_24') %>%
+ggplot(mapping = aes(x= log(meters), y = ecoregion, fill = ecoregion)) +
+geom_density_ridges(alpha = 0.6) +
+theme_ridges() +
+theme(legend.position = "none") +
+xlim(0,10)
+
+
+eco_ridges
+  
+```
+
+```{r}
+# Combine and prepare
+long_data_viz <- long_data %>%
+  filter(measure_type %in% c("dist_00", "dist_24")) %>%
+  mutate(
+    period = case_when(
+      measure_type == "dist_00" ~ "2000",
+      measure_type == "dist_24" ~ "2024"
+    ),
+    ecoregion = fct_reorder(ecoregion, desc(meters), .fun = mean, na.rm = TRUE)
+  )
+
+# Plot
+ggplot(long_data_viz, aes(x = log10(meters), y = ecoregion, fill = period)) +
+  geom_density_ridges(
+    alpha = 0.6,
+    scale = 0.97,
+    stat = "binline",
+    bins = 100,
+    position = "identity",
+    color = NA
+  ) +
+  theme_ridges() +
+  ylab("Ecoregion") +
+  xlab("log10(Distance in meters)") +
+  labs(fill = "Year") + 
+scale_fill_manual(values = c('2000' ='maroon', '2024' ='orange'
+))
+  ggtitle("Distribution of Distances By Ecoregion (2000 vs 2024)")
+```
+
+```{r fig.height =8, fig.width=10}
+lulc_00 <- long_data %>% 
+  mutate(
+    lulc = fct_reorder(lulc, desc(meters), .fun = mean, na.rm = TRUE)
+  ) %>%
+filter(measure_type %in% c('dist_00')) %>%
+ggplot(mapping = aes(x= log10(meters), y = lulc, fill = lulc)) +
+geom_density_ridges(alpha = 0.6, scale = 0.97, stat = "binline", bins = 100) +
+theme_ridges() +
+theme(legend.position = "none") +
+ylab('Land Use/Land Cover') +
+ggtitle('2000')
+
+
+lulc_00
+
+
+lulc_24 <- long_data %>% 
+  mutate(
+    lulc = fct_reorder(lulc, desc(meters), .fun = mean, na.rm = TRUE)
+  ) %>%
+filter(measure_type %in% c('dist_24')) %>%
+ggplot(mapping = aes(x= log1p(meters), y = lulc, fill = lulc)) +
+geom_density_ridges(alpha = 0.6, scale = 0.97, stat = "binline", bins = 100) +
+theme_ridges() +
+theme(legend.position = "none") +
+ylab('Land Use/Land Cover') +
+ggtitle('2024')
+
+
+lulc_24
+
+
+```
+
+```{r fig.height =8, fig.width=10}
+#| lightbox: true
+library(ggplot2)
+library(ggridges)
+library(dplyr)
+library(forcats)
+
+# Combine and prepare
+long_data_viz <- long_data %>%
+  filter(measure_type %in% c("dist_00", "dist_24")) %>%
+  mutate(
+    period = case_when(
+      measure_type == "dist_00" ~ "2000",
+      measure_type == "dist_24" ~ "2024"
+    ),
+    lulc = fct_reorder(lulc, desc(meters), .fun = mean, na.rm = TRUE)
+  )
+
+# Plot
+ggplot(long_data_viz, aes(x = log1p(meters), y = lulc, fill = period)) +
+  geom_density_ridges(
+    alpha = 0.6,
+    scale = 0.97,
+    stat = "binline",
+    bins = 100,
+    position = "identity",
+    color = NA
+  ) +
+  theme_ridges() +
+  ylab("Land Use/Land Cover") +
+  xlab("log1p(Distance in meters)") +
+  labs(fill = "Year") + 
+scale_fill_manual(values = c('2000' ='maroon', '2024' ='orange'
+))
+  ggtitle("Distribution of Distances (2000 vs 2024)")
+
+```
+
+```{r}
+#| fig-cap: 'Comparison of Pairwise Points and Their Distance to the Nearest Road in 2000 and 2024'
+paired_scatter <- sample_n(all_data, 5000) %>%
+  ggplot() +
+  geom_point(aes(x=dist_00, y =dist_24), alpha = 0.5) +
+scale_fill_continuous(type= "viridis") +
+xlab("Distance to the nearest road in 2000")+
+ylab("Distance to the nearest road in 2024") +
+xlim(0,5000) +
+ylim(0,5000)
+
+ggplotly(paired_scatter)
+```
+
+```{r}
+
+ old_data <- read.csv("F:\\01_PROJECTS\\all_data.csv")
+
+```
+
+```{r}
+#| fig.cap = 'Values of Distance to the Nearest Road in 2000 vs 2024, using base data (orange), and snapped data (purple)'
+two_scatters <- sample_n(old_data, 5000) %>%
+  ggplot() +
+  geom_point(aes(x = dist_2k_no_snap, y = dist_24, color = "No Snap"), alpha = 0.2) +
+  geom_point(aes(x = dist_2k, y = dist_24, color = "Snap"), alpha = 0.2) +
+  scale_color_manual(values = c("No Snap" = "orange", "Snap" = "purple")) +
+  xlab('Distance to the nearest road in 2000') +
+  ylab('Distance to the nearest road in 2024') +
+  labs(color = "Network Type") +
+  xlim(0,5000)+
+ylim(0,5000) +
+theme_bw()
+
+ggplotly(two_scatters)
+
+```
+
+## Below Figures:
+
+### 1 & 2: Vector (point) values of distance to the nearest road in 2000 (top) and 2024 (bottom). Light: closer, dark: farther
+
+![](yr_00_dot_map.png)
+
+![](yr_24_dot_map.png)
+
+### 3 & 4: Point data aggregated to 1km cells, showing distance to the nearest road in 2000 (top) and 2024 (bottom). Bright (yellow): closer, dark (blue): farther.
+
+![](yr_00_raster_map.png)
+
+![](yr_24_raster_map.png)
