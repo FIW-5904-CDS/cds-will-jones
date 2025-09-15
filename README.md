@@ -1,6 +1,6 @@
 ## Description
 
-
+This project is using a variety of geospatial methods in R (sf package) and QGIS to build upon the work of a previous ecology paper from 2003.
 ## General Info
 
 1. Proposed Title: How Far to the Nearest Road? Geospatial Approach to Road 
