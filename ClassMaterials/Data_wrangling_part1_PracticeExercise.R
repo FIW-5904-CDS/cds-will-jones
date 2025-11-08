@@ -74,6 +74,9 @@ bugs_long <- prac_data %>% pivot_longer(cols = -all_of(c('uniqueid','transect', 
 
 # 9) Just to test it out, make your "long" dataset into a "wide" one and see if anything is different. -------
 
+bugs_wide <- bugs_long %>%
+  pivot_wider(names_from = 'order', values_from = 'count')
+
 # Are you getting an error? Can you figure out why? 
 
 # 10) Join the "InsectData" with the "CollectionDates" tab ---------
