@@ -1,0 +1,156 @@
+# Plotting assigment 1
+
+
+
+```{r fig.height =8, fig.width=10}
+#| fig-cap: 'Distribution of Paired Sample Points'
+
+# Sample jitter data separately
+jitter_sample <- long_data %>%
+  filter(measure_type %in% c('dist_00', 'dist_24')) %>%
+  mutate(measure_type = factor(measure_type, levels = c('dist_00', 'dist_24'))) %>%
+  filter(
+    meters >= quantile(meters, 0.05, na.rm = TRUE),
+    meters <= quantile(meters, 0.95, na.rm = TRUE)
+  ) %>%
+  sample_n(2000)  # Smaller sample just for jitter
+levels(jitter_sample$measure_type) <- c("2000", "2024")
+
+# Full data for boxplot
+box_data <- long_data %>%
+  filter(measure_type %in% c('dist_00', 'dist_24')) %>%
+  mutate(measure_type = factor(measure_type, levels = c('dist_00', 'dist_24'))) %>%
+  filter(
+    meters >= quantile(meters, 0.05, na.rm = TRUE),
+    meters <= quantile(meters, 0.95, na.rm = TRUE)
+  )
+levels(box_data$measure_type) <- c("2000", "2024")
+
+box_plot <- ggplot(box_data, aes(x = measure_type, y = meters)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(
+    data = jitter_sample, 
+    aes(x = measure_type, y = meters, color = measure_type), # map color to measure_type
+    width = 0.35, alpha = 0.4, size = 4
+  ) +
+  scale_color_manual(values = c("2000" = "#ea5f94", "2024" = "#3940bb")) + # custom colors
+  theme_minimal() +
+  xlab("Year") +
+  ylab("Distance from Nearest Road (meters)") +
+  theme(legend.position = "none")  # optional: remove legend
+
+```
+
+
+```{r fig.height =8, fig.width=10}
+#| fig-cap: "Distribution of Paired Points"
+pairwise_histogram <- long_data %>%
+  filter(measure_type %in% c('dist_00','dist_24'
+  )) %>%
+  mutate(measure_type = factor(measure_type,
+                          levels = c("dist_00", "dist_24"),
+                          labels = c("2000", "2024"))) %>%
+  ggplot(mapping = aes(x = log10(meters), fill = measure_type)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 500) +
+  scale_fill_manual(values = c("2000" = "#ea5f94", "2024" = "#3940bb")) +
+    labs(
+    fill = "Year",  # <–– legend title
+    x = "Distance to Nearest Road (log10 meters)",
+    y = "Count"
+  ) +
+  theme_minimal() 
+
+pairwise_histogram
+```
+
+```{r}
+valleys_coves <- long_data %>%
+  filter(measure_type %in% c('dist_00','dist_24'
+  )) %>%
+  filter(ecoregion == "Limestone Valleys and Coves"
+  ) %>%
+  mutate(measure_type = factor(measure_type,
+                          levels = c("dist_00", "dist_24"),
+                          labels = c("2000", "2024"))) %>%
+  ggplot(mapping = aes(x = meters, fill = measure_type)) +
+  geom_density(position = "identity", alpha = 0.5) +
+  scale_fill_manual(name = 'Year', values = c("2000" = "#ea5f94", "2024" = "#3940bb")) +
+  theme_minimal() +
+  xlab('Distance from Nearest Road (m)') +
+  ylab('')
+
+
+valleys_coves
+```
+
+```{r fig.height =8, fig.width=10}
+#| lightbox: true
+library(ggplot2)
+library(ggridges)
+library(dplyr)
+library(forcats)
+
+# Combine and prepare
+long_data_viz <- long_data %>%
+  filter(measure_type %in% c("dist_00", "dist_24")) %>%
+  mutate(
+    period = case_when(
+      measure_type == "dist_00" ~ "2000",
+      measure_type == "dist_24" ~ "2024"
+    ),
+    lulc = fct_reorder(lulc, desc(meters), .fun = mean, na.rm = TRUE)
+  )
+
+# Plot
+lulc_2000_vs_2024 <- ggplot(long_data_viz, aes(x = log1p(meters), y = lulc, fill = period)) +
+  geom_density_ridges(
+    alpha = 0.6,
+    scale = 0.97,
+    stat = "binline",
+    bins = 100,
+    position = "identity",
+    color = NA
+  ) +
+  theme_ridges() +
+  ylab("Land Use/Land Cover") +
+  xlab("log1p(Distance in meters)") +
+  labs(fill = "Year") + 
+scale_fill_manual(name = 'Year', values = c("2000" = "#ea5f94", "2024" = "#3940bb"
+)) + 
+  ggtitle("Distribution of Distances (2000 vs 2024)")
+
+
+lulc_2000_vs_2024
+
+```
+
+``` {r}
+
+state_outline <- st_read(r"{E:\01_PROJECTS\01_Roads\02_vector_data\tl_2024_us_state.shp}") %>% filter(GEOID == 51) %>% st_geometry()
+sample_pts <- sample_n(all_data, 5000) %>% st_geometry() %>% st_transform(crs = crs(state_outline))
+
+plot(state_outline)
+plot(sample_pts, add = TRUE)
+
+study_area <- ggplot() +
+  geom_sf(data = state_outline, fill = NA, color = "black") +
+  geom_sf(data = sample_pts, color = "black", size = 2) +
+  coord_sf(expand = FALSE, default_crs = sf::st_crs(state_outline)) +
+  theme(aspect.ratio = NULL) +
+  theme_map()
+
+study_area
+
+```
+
+
+
+```{r}
+
+(study_area + pairwise_histogram) / (box_plot + valleys_coves + lulc_2000_vs_2024)
+pairwise_histogram / (box_plot + valleys_coves + lulc_2000_vs_2024)
+
+study_area / (box_plot + valleys_coves + lulc_2000_vs_2024)
+
+
+```
