@@ -1,0 +1,51 @@
+---
+title: "Geospatial Analysis of a Changing Road Network, 11-17-2025"
+author: "Will Jones"
+editor: source
+format:
+  html:
+    embed-resources: true
+execute: 
+  echo: false
+  cache: true
+  warning: false
+  message: false
+  publish:
+  resources:
+  - "*.png"
+---
+
+```{r}
+#| warning: false
+#| echo: false
+#| message: false
+library(sf)
+library(terra)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(tidyr)
+library(nngeo)
+library(leaflet)
+library(leaflegend)
+library(tigris)
+library(foreign)
+library(purrr)
+library(tidyverse)
+library(readr)
+library(ggridges)
+library(tmap)
+library(landscapemetrics)
+library(patchwork)
+library(ggthemes)
+library(gt)
+```
+
+## Tables
+
+![Table showing summary statistics of each distribution, 2000 and 2024, in meters](E:\01_PROJECTS\01_Roads\05_viz\summary_stats.png)
+
+## Figures
+![(a). Histograms for two paired distributions, for the year 2000 and 2024, showing a left-shift from the measured values, indicating that the measured points became closer to the nearest road, (b). Boxplot showing the distributions of distance to the nearest road in each year, (c). Density plot for a specific EPA level IV ecozone, Limestone Valleys and Coves, indicating distances to the nearest road, (d). ridgeplot of the measured values for 11 NLCD land use land cover classes](E:\01_PROJECTS\01_Roads\05_viz\plot-1284.png)
+
+![Map of Montgomery County, Virginia. Point color represents land cover classification, and point size represents its distance to the nearest road](E:\01_PROJECTS\01_Roads\05_viz\map_with_labels.jpg)
