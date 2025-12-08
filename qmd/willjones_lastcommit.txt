@@ -1,5 +1,0 @@
-commit 56e2d9ebb2a0e5f149c189aada0d5f268593fafc
-Author: Will Jones <willj98@vt.edu>
-Date:   Wed Nov 19 19:16:24 2025 +0000
-
-    figured out how to attach table and figures as external docs. rendered much faster. each table and figure has caption.
