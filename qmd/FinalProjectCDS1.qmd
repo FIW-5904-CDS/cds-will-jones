@@ -70,7 +70,7 @@ library(ggthemes)
 library(gt)
 ```
 
-## Abstract
+# Abstract
 
 The 2003 study "How Far to the Nearest Road ?" published in *Frontiers in Ecology and The Environment* studied the road network of the United States [@riitters.etal.2003]. Specifically, it split the contiguous US into 30x30 m grid cells and classified each as being a "road" or "non-road" cell, based on if any part of the cell intersects a TIGER/line road feature. Then, a binned classification was used to measure the distance of every cell to its nearest road cell.
 

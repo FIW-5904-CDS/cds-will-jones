@@ -1,0 +1,689 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Geospatial Analysis of a Changing Road Network},
+  pdfauthor={Will jones; Ben Jantzen; Yang Shao},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Geospatial Analysis of a Changing Road Network}
+\author{Will jones \and Ben Jantzen \and Yang Shao}
+\date{2025-11-19}
+\begin{document}
+\maketitle
+
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{4}
+\tableofcontents
+}
+
+\section{Abstract}\label{abstract}
+
+The 2003 study ``How Far to the Nearest Road ?'' published in
+\emph{Frontiers in Ecology and The Environment} studied the road network
+of the United States (\citeproc{ref-riitters.etal.2003}{Riitters and
+Wickham 2003}). Specifically, it split the contiguous US into 30x30 m
+grid cells and classified each as being a ``road'' or ``non-road'' cell,
+based on if any part of the cell intersects a TIGER/line road feature.
+Then, a binned classification was used to measure the distance of every
+cell to its nearest road cell.
+
+Our aim is to expand on this methodology using GIS and statistical
+methods. Specifically, our objective is to answer the following
+questions:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  By randomly sampling points and calculating straight-line (Euclidean)
+  distances, can we measure a more accurate continuous distribution of
+  distance to the nearest road?
+\item
+  Using archived Census Bureau TIGER/Line geographic data, can we
+  measure how far the average distance to the nearest road has changed
+  in the contiguous US?
+\item
+  What water bodies have experienced the greatest change and become more
+  vulnerable to ecological effects of road construction and operation?
+\end{enumerate}
+
+\section{Introduction}\label{introduction}
+
+There are well-documented effects of roads on habitat fragmentation
+{[}CITE{]}, plant health {[}CITE{]}, and species diversity {[}CITE{]}.
+Native stream invertebrate species may be especially at risk. In fact,
+Gál, et al.~found that road crossings had negative effects on the
+biodiversity of native invertebrates in Hungary, including species
+richness, abundance, and prevalence of protected species
+(\citeproc{ref-blanka.etal.2020}{Gál et al. 2020}). Between X and X
+year, Y miles of roads have been built, an average of X miles of road
+per year {[}CITE{]}. Of course, this period encompasses the time since
+the last contiguous United States-level measurement of distances to the
+nearest road in 2003 (\citeproc{ref-riitters.etal.2003}{Riitters and
+Wickham 2003}). Using GIS methods and a statistical approach based on
+the energy distance (\citeproc{ref-szekely.gabor.2004}{Szekely, Rizzo,
+and Székely 2004}), we may examine the expansion of the United States
+road network for future ecological applications. Additionally, through
+measurement of a paired continuous distribution of distances (2000 and
+2024), we may observe the magnitude of change in distances, both at the
+national scale, and at relevant sub-levels, including watershed, EPA
+ecoregion, NLCD landcover class, and even individual stream level.
+
+\section{Methods}\label{methods}
+
+\subsection{Data Acquisition and
+Preprocessing}\label{data-acquisition-and-preprocessing}
+
+Six primary spatial datasets were used in our analysis. The 2023 USGS
+National Land Cover Database (NLCD), containing 11 distinct land cover
+classes, was used to extract surface type at each of our sampled points
+(\citeproc{ref-usgs}{{``Annual NLCD Collection 1 Science Products''}
+2024}). Likewise, attribute data for each sampled point was extracted
+using the EPA's ecoregion level IV map, and watershed membership was
+extracted using the USGS 3D Hydrography Program (3DHP) data set. 3DHP is
+a unified lidar-derived data product containing vector data for streams,
+lakes, ponds, catchments, and other hydrologic features (USGS, 2025).
+
+US Census Bureau's TIGER/Line vector files were used as the road
+networks in this project. The most recently available 2024 road network
+data for the conterminous United States was downloaded in bulk using the
+roads() function from the Python package pygris
+(\citeproc{ref-pygris}{{``Pygris,''} n.d.}).
+
+Comparable data for the year 2000 was downloaded from the archived
+Census FTP site (\url{https://www2.census.gov/geo/tiger/tiger2k/),} and
+a multi- step data preprocessing workflow was performed before the data
+was implemented in the analysis workflow. First, beautifulsoup4 was used
+to download vector dataset in RT1 format, the historical file format for
+census geographic data (\citeproc{ref-beautifulsoup}{Richardson 2007}).
+Using GDAL command-line utilities, files were converted to modern
+shapefile format, then merged into a single dataset using geopandas in
+python (\citeproc{ref-geopandas}{Jordahl et al. 2020}). Finally, feature
+correction was performed using geometry-snapping and densification
+processing in QGIS 3.36 ''Maidenhead.'' To rectify data quality issues,
+namely feature accuracy and spatial mismatch between existing roads in
+the 2000 and 2024 datasets, the historical vector dataset was densified
+at regular 25m intervals, then snapped to the nearest matching feature
+in the current roads dataset. This was done to avoid erroneous
+measurement differences in distance to the nearest road for each year
+that may be incorrectly attributed to removal or addition of a new road
+feature (\citeproc{ref-t2024}{\textbf{t2024?}}).
+
+\subsection{Sampling Scheme and
+Measurement}\label{sampling-scheme-and-measurement}
+
+\subsubsection{Terrestrial Points}\label{terrestrial-points}
+
+Using the R package sf, 1,000,000 points were randomly sampled across
+our study area (Virginia, USA). Points were sampled uniformly across
+space, meaning that everywhere on the continuous surface has equal
+likelihood of being sampled (Fotheringham and Rogereson 2008). Next, the
+nearest feature from each road network (2000 and 2024) was identified
+for each randomly sampled point, and the Euclidean distance between the
+two geometries was measured. The result was two continuous
+distributions, each containing a measurement at the same point. This is
+a case of paired data, analogous to `before and after' measurements.
+
+\subsubsection{Water Points}\label{water-points}
+
+To perform the corresponding process for water features (lakes, ponds,
+streams, creeks), a slightly different sampling method was used. It is
+our goal to randomly select points along linear water features and along
+the \emph{edges} of waterbodies (polygons). We do not want to sample
+points within ponds or lakes, because the measurement of interest is the
+distance between the least central points of each areal feature (i.e.,
+the ``shore'') and the nearest road feature. This effectively captures
+where ecological interactions such as runoff into ponds/lakes will
+occur. To do this, the layers \texttt{hydro\_3dhp\_all\_flowline} and
+\texttt{hydro\_3dhp\_all\_waterbody} were extracted from the USGS 3DHP
+geodatabase, representing flowlines and waterbodies, respectively. Due
+to the structure of the 3DHP features, \texttt{flowlines} are often
+drawn through the waterbody that they feed into. To navigate this, and
+avoid sampling within water bodies, the \texttt{sf} package function
+\texttt{st\_difference} was used to eliminate these overlapping
+flowlines from the features that could be sampled on. Lastly, lake and
+pond boundaries were merged with stream and river features into a single
+linear feature layer. When using \texttt{st\_sample}, this ensures that
+the points are uniformly randomly sampled, meaning that any point in our
+dataset has equal probability of being sampled.
+
+\begin{figure}
+
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/wrong_water_pts.png}}
+
+}
+
+\subcaption{\label{fig-wrong}Sampling on water features before removing
+overlapping flowlines}
+
+\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/good_water_pts.png}}
+
+}
+
+\subcaption{\label{fig-right}Sampling on water features after removing
+overlaping flowlines}
+
+\end{minipage}%
+
+\end{figure}%
+
+\subsection{Statistical Analysis}\label{statistical-analysis}
+
+For the purposes of this class project, 100,000 of the
+\textasciitilde1e6 points were chosen randomly for analysis in order to
+make local processing possible.
+
+To compare the shift in distributions from 2000 to 2024, a permutation
+test for matched pairs was used (\citeproc{ref-welch.1990}{Welch 1990}),
+along with bootstrap resampling (\citeproc{ref-dixon.2001}{Dixon 2001})
+to construct a confidence interval for the test statistic of interest,
+the mean of the differences between the paired points. The mean of the
+paired differences was chosen as the test statistic for analysis because
+the data set is dominated by points whose values did not change (i.e.,
+difference is 0).This characteristic of the distribution, along with the
+fact that the distribution of differences is not symmetric around the
+mean (see Figure~\ref{fig-qq}), is why we did not use the Wilcoxon
+Signed Rank test.
+
+\begin{figure}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/differences_qq.png}}
+
+}
+
+\caption{\label{fig-qq}}
+
+\end{figure}%
+
+We used bootstrapping (\citeproc{ref-dixon.2001}{Dixon 2001}) to
+construct a sampling distribution and confidence interval for the mean
+of paired differences. The observed mean of the differences between our
+paired data is 74.89 meters. After bootstrap resampling, we have a
+theoretical sampling distribution with a mean of 74.87 meters (95\% CI:
+(73.19, 76.60)) and a standard error of 0.87 meters.
+
+\pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/bootstrap_hist.png}}
+
+\subsubsection{Permutation Test}\label{permutation-test}
+
+Then we performed a permutation test for paired data
+(\citeproc{ref-matched.perm}{{``Permutation Test for Matched Pairs
+Data,''} n.d.}) to test for significance in our results:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{results }\OtherTok{=} \FunctionTok{c}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{5000}\NormalTok{) \{}
+\NormalTok{  permutedData }\OtherTok{=} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{),}\DecValTok{100000}\NormalTok{,}\AttributeTok{replace=}\NormalTok{T)}\SpecialCharTok{*}\NormalTok{dat}\SpecialCharTok{$}\NormalTok{difference}
+\NormalTok{  results }\OtherTok{=} \FunctionTok{c}\NormalTok{(}\FunctionTok{mean}\NormalTok{(permutedData),results)}
+\NormalTok{\}}
+\FunctionTok{hist}\NormalTok{(results,}\AttributeTok{col=}\StringTok{\textquotesingle{}gray\textquotesingle{}}\NormalTok{,}\AttributeTok{main=}\StringTok{"Permutation Distribution"}\NormalTok{,}\AttributeTok{xlab=}\StringTok{"Simulated difference"}\NormalTok{)}
+\FunctionTok{mean}\NormalTok{(results)}
+\NormalTok{results }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(results)}
+\end{Highlighting}
+\end{Shaded}
+
+For the standard case of a permutation test, the null hypothesis is that
+the two groups of interest come from the \emph{same distribution}, and
+the alternative hypothesis is that the groups are not from the same
+distribution. In the case of the matched-pairs permutation test, our
+hypotheses are:
+
+\[
+\Large
+H_0: \mu_{\text{diff}} = 0  
+\]
+
+In other words, the difference in the before and after values of points
+is due to random chance
+
+\[
+\Large
+H_a: \mu_{\text{diff}} \neq 0
+\]
+
+The permutation test computes 5,000 permutations of the 100,000 paired
+points, where before/after values are switched. At each permutation, the
+test statistic (the mean of all the paired differences) is computed.
+This creates a roughly normal distribution of mean values. This works on
+the assumption that if there truly is no difference in the distributions
+of the before and after groups. Under the null assumption, the observed
+test statistic (74.89 m, which we calculated from our original sample),
+should fall somewhere within the ``null'' or permutation distribution.
+To calculate our p-value, we take the proportion of all permutation
+values that are equal to or more extreme than our test statistic.
+Figure~\ref{fig-permHist} shows clearly that the test statistic obtained
+from our sample (red line) is far more extreme than what can be expected
+if there is no difference in the values of before/after groups.
+
+\begin{figure}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/perm_hist.png}}
+
+}
+
+\caption{\label{fig-permHist}Visualization of permutation test for
+statistically significant difference in the means of 2000 and 2024
+distributions, p\textless0.0001}
+
+\end{figure}%
+
+\section{Results}\label{results}
+
+here give summary statistics
+
+i think would be good to include change in distance by land cover
+classes, even ecoregions?
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=9.375in,height=\textheight,keepaspectratio]{ProjectFigures/facet_nlcd.png}
+
+}
+
+\caption{\label{fig-facet}Scatterplots of distance from the nearest road
+in 2000 (x-axis) vs 2024(y-axis), separated by NLCD class. Color scale
+representing proportion of total sampled points that became closer to
+the nearest road.}
+
+\end{figure}%
+
+ridge plots could be good, simple bar chart showing mean change in
+distance for each land cover type
+
+ladder (?) plot showing change by land cover or ecoregion
+
+``based on our analysis, X km of roads were constructed between 2000 and
+2024, resulting in a measured shift of X with MEAN \_\_ and SD \_\_\_.
+take from bootstrap sampling distribution?
+
+\section{Tables}\label{tables}
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/summary_stats1.png}}
+
+}
+
+\caption{Table showing summary statistics of each distribution, 2000 and
+2024, in meters}
+
+\end{figure}%
+
+\section{Figures}\label{figures}
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/whole_state_map.jpg}}
+
+}
+
+\caption{VA Map}
+
+\end{figure}%
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/plot-1284.png}}
+
+}
+
+\caption{(a). Histograms for two paired distributions, for the year 2000
+and 2024, showing a left-shift from the measured values, indicating that
+the measured points became closer to the nearest road, (b). Boxplot
+showing the distributions of distance to the nearest road in each year,
+(c). Density plot for a specific EPA level IV ecozone, Limestone Valleys
+and Coves, indicating distances to the nearest road, (d). ridgeplot of
+the measured values for 11 NLCD land use land cover classes}
+
+\end{figure}%
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/water_sampling.png}}
+
+}
+
+\caption{Example of points sampled along water features in Franklin
+County, VA}
+
+\end{figure}%
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{ProjectFigures/map_with_labels.jpg}}
+
+}
+
+\caption{Map of Montgomery County, Virginia. Point color represents land
+cover classification, and point size represents its distance to the
+nearest road}
+
+\end{figure}%
+
+\subsection{Abbreviations}\label{abbreviations}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{3DHP} 3D Hydrography Program
+\item
+  \textbf{EPA} Environmental Protection Agency
+\item
+  \textbf{GDAL} Geospatial Data Abstraction Library
+\item
+  \textbf{HUC} Hydrologic Unit Code
+\item
+  \textbf{NLCD} National Land Cover Database
+\item
+  \textbf{TIGER} Topologically Integrated Geographic Encoding and
+  Referencing
+\item
+  \textbf{USGS} United States Geoglogical Survey
+\end{itemize}
+
+\section*{References}\label{references}
+\addcontentsline{toc}{section}{References}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-usgs}
+{``Annual NLCD Collection 1 Science Products.''} 2024. US Geological
+Survey (USGS).
+
+\bibitem[\citeproctext]{ref-dixon.2001}
+Dixon, Philip M. 2001. {``Bootstrap Resampling.''} \emph{Encyclopedia of
+Environmetrics}, October.
+\url{https://doi.org/10.1002/9780470057339.VAB028}.
+
+\bibitem[\citeproctext]{ref-blanka.etal.2020}
+Gál, Blanka, András Weiperth, János Farkas, and Dénes Schmera. 2020.
+{``The Effects of Road Crossings on Stream Macro-Invertebrate
+Diversity.''} \emph{Biodiversity and Conservation} 29 (March): 729--45.
+\url{https://doi.org/10.1007/S10531-019-01907-4}.
+
+\bibitem[\citeproctext]{ref-geopandas}
+Jordahl, Kelsey, Joris Van den Bossche, Martin Fleischmann, Jacob
+Wasserman, James McBride, Jeffrey Gerard, Jeff Tratner, et al. 2020.
+{``Geopandas/Geopandas: V0.8.1.''} Zenodo.
+\url{https://doi.org/10.5281/zenodo.3946761}.
+
+\bibitem[\citeproctext]{ref-matched.perm}
+{``Permutation Test for Matched Pairs Data.''} n.d.
+\url{https://people.hsc.edu/faculty-staff/blins/classes/spring19/math222/Examples/MatchedPairsPermutationTest.html}.
+
+\bibitem[\citeproctext]{ref-pygris}
+{``Pygris.''} n.d. \url{https://walker-data.com/pygris/}.
+
+\bibitem[\citeproctext]{ref-beautifulsoup}
+Richardson, Leonard. 2007. {``Beautiful Soup Documentation.''}
+\emph{April}.
+
+\bibitem[\citeproctext]{ref-riitters.etal.2003}
+Riitters, Kurt H, and James D Wickham. 2003. {``How Far to the Nearest
+Road?''} \emph{Ecology and the Environment}. Vol. 1.
+
+\bibitem[\citeproctext]{ref-szekely.gabor.2004}
+Szekely, Gabor J, Maria L Rizzo, and Gábor J Székely. 2004. {``Testing
+for Equal Distributions in High Dimension.''}
+\url{https://www.researchgate.net/publication/228918499}.
+
+\bibitem[\citeproctext]{ref-welch.1990}
+Welch, William J. 1990. {``Construction of Permutation Tests.''}
+\emph{Journal of the American Statistical Association} 85: 693--98.
+\url{https://doi.org/10.1080/01621459.1990.10474929}.
+
+\end{CSLReferences}
+
+
+
+
+\end{document}
